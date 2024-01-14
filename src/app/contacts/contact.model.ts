@@ -4,6 +4,7 @@ export interface Contact {
   lastName: string,
   dateOfBirth: Date | null,
   favoritesRanking: number | null,
+  // phone: Partial<Phone>,
   phone: Phone,
   address: Address,
 }
