@@ -6,48 +6,129 @@
     <section>
       <nav>Name/Info</nav>
       <div>
-        <input formControlName="firstName" placeholder="First Name" />
+        <con-profile-icon-selector formControlName="icon" />
+        <input
+          formControlName="firstName"
+          placeholder="First Name"
+          [class.error]="firstName.invalid && firstName.touched"
+        />
+        <!-- <em
+          *ngIf="firstName.invalid && firstName.touched"
+        >Please enter a First Name</em> -->
+        <em *ngIf="firstName.errors?.['required'] && firstName.touched" >
+          Please enter a First Name
+        </em>
+        <em *ngIf="firstName.errors?.['minlength'] && firstName.touched" >
+          First Name must be at least 3 characters
+        </em>
         <input formControlName="lastName" placeholder="Last Name" />
-        <input formControlName="dateOfBirth" placeholder="Date of Birth" />
-        <input formControlName="favoritesRanking" placeholder="Favorites Ranking" />
+        <input
+          formControlName="dateOfBirth"
+          placeholder="Date of Birth"
+          type="date"
+        />
+        <div>
+          <span>Favorites Ranking</span>
+          <input
+            formControlName="favoritesRanking"
+            type="range"
+            min="0"
+            max="5"
+            placeholder="Favorites Ranking"
+          />
+          <span>{{contactForm.controls.favoritesRanking.value}}</span>
+        </div>
+        <div>
+          <input type="checkbox" formControlName="personal" /> Personal
+        </div>
       </div>
     </section>
     <section>
-      <nav>Phone</nav>
-      <div class="flex-column" formGroupName="phone" >
-        <div class="flex-group">
-          <input formControlName="phoneNumber" placeholder="Phone" />
-          <img src="/assets/plus-grey-blue.png" class="add" />
-        </div>
-        <div class="radio">
-          <input type="radio" formControlName="phoneType" value="mobile"> Mobile
-          <input type="radio" formControlName="phoneType" value="work"> Work
-          <input type="radio" formControlName="phoneType" value="other"> Other
+      <nav>Phones</nav>
+      <!-- <div class="flex-column" formGroupName="phone" > -->
+      <div formArrayName="phones" >
+        <div
+          *ngFor="let phone of contactForm.controls.phones.controls; let i=index"
+          [formGroupName]="i"
+          class="flex-column"
+        >
+          <div class="flex-group">
+            <input formControlName="phoneNumber" placeholder="Phone" />
+            <img
+              src="/assets/plus-grey-blue.png"
+              class="add"
+              (click)="addPhone()" />
+          </div>
+          <em *ngIf="phone.controls.phoneNumber.invalid" >Preferred Phone is required</em>
+          <div class="radio">
+            <!-- <input type="radio" formControlName="phoneType" value="mobile"> Mobile
+            <input type="radio" formControlName="phoneType" value="work"> Work
+            <input type="radio" formControlName="phoneType" value="other"> Other -->
+            <span *ngFor="let phoneType of phoneTypes">
+              <input type="radio" formControlName="phoneType"
+                [value]="phoneType.value"> {{phoneType.title}}
+            </span>
+          </div>
+          <span>
+            <input type="checkbox" formControlName="preferred" />
+            Preferred
+          </span>
         </div>
       </div>
     </section>
     <section>
       <nav>Address</nav>
-      <div>
-        <div formGroupName="address" class="address">
+      <div formArrayName="addresses">
+        <div
+          *ngFor="let address of contactForm.controls.addresses.controls;
+                  let i=index"
+          [formGroupName]="i"
+          class="address"
+          [class.error] = "contactForm.controls.addresses.invalid && contactForm.controls.addresses.dirty"
+        >
           <div class="flex-group">
             <input placeholder="Address" formControlName="streetAddress" />
-            <img src="/assets/plus-grey-blue.png" class="add" />
+            <img
+              src="/assets/plus-grey-blue.png"
+              class="add"
+              (click)="addAddress()"/>
           </div>
           <input placeholder="City" formControlName="city" />
           <input placeholder="State/Region" formControlName="state" />
           <input placeholder="Zip/Postal Code" formControlName="postalCode" />
-          <select>
-            <option value="home">Home</option>
+          <select formControlName="addressType">
+            <!-- <option value="home">Home</option>
             <option value="work">Work</option>
-            <option value="mobile">Other</option>
+            <option value="mobile">Other</option> -->
+            <option
+              *ngFor="let addressType of addressTypes"
+              [value]="addressType.value"
+            >{{addressType.title}}
+            </option>
           </select>
         </div>
+        <em
+          *ngIf="contactForm.controls.addresses.invalid && contactForm.controls.addresses.dirty"
+        >Incomplete Address</em>
+      </div>
+    </section>
+    <section>
+      <nav>Notes</nav>
+      <div>
+        <textarea
+          placeholder="Notes"
+          rows="5"
+          formControlName="notes"
+          [class.error]="notes.invalid"
+        ></textarea>
+        <em *ngIf="notes.errors?.['restrictedWords']">
+          Restricted word found: {{notes.errors?.['restrictedWords']}}
+        </em>
       </div>
     </section>
     <div class="buttons">
       <button class="secondary">Cancel</button>
-      <button type="submit" class="primary">Save</button>
+      <button type="submit" class="primary" [disabled]="contactForm.invalid">Save</button>
     </div>
   </form>
 </div>
